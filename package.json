@@ -1,0 +1,32 @@
+{
+  "name": "react-hooks-presentation",
+  "version": "1.0.0",
+  "description": "Интерактивная презентация по базовым хукам React 19",
+  "main": "index.html",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "react",
+    "hooks",
+    "presentation",
+    "demo",
+    "react19"
+  ],
+  "author": "React Demo",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.13",
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.2",
+    "vite": "^5.4.8"
+  }
+}
