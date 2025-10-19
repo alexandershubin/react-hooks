@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import ReactTheoryPresentation from './theory/ReactTheoryPresentation.jsx'
 import UseStateDemo from './base-hook/UseStateDemo.jsx'
 import UseEffectDemo from './base-hook/UseEffectDemo.jsx'
 import UseContextDemo from './base-hook/UseContextDemo.jsx'
@@ -818,12 +819,18 @@ function Presentation() {
     const [currentSlide, setCurrentSlide] = useState(0);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [openMenu, setOpenMenu] = useState(null); // 'basic', 'additional', 'react18plus', or 'react19plus'
+    const [isBurgerOpen, setIsBurgerOpen] = useState(false);
 
     const slides = [
         {
             id: 'intro',
             title: 'Введение',
             component: IntroSlide
+        },
+        {
+            id: 'reactTheory',
+            title: 'React - Теория',
+            component: ReactTheoryPresentation
         },
         {
             id: 'basicHooks',
@@ -939,13 +946,21 @@ function Presentation() {
         setCurrentSlide(index);
     };
 
-    const toggleFullscreen = () => {
-        if (!isFullscreen) {
-            document.documentElement.requestFullscreen?.();
-        } else {
-            document.exitFullscreen?.();
+    const toggleFullscreen = async () => {
+        try {
+            if (!isFullscreen) {
+                await document.documentElement.requestFullscreen?.();
+                setIsFullscreen(true);
+            } else {
+                if (document.fullscreenElement) {
+                    await document.exitFullscreen?.();
+                }
+                setIsFullscreen(false);
+            }
+        } catch (error) {
+            console.log('Fullscreen toggle failed:', error);
+            setIsFullscreen(false);
         }
-        setIsFullscreen(!isFullscreen);
     };
 
     // Обработка клавиш
@@ -985,360 +1000,413 @@ function Presentation() {
                 <p>Интерактивная презентация с живыми примерами</p>
             </div>
 
-            <div className="navigation">
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'start',
-                    gap: '0',
-                    width: '100%'
-                }}>
-                    <button
-                        className={`nav-btn ${currentSlide === 0 ? 'active' : ''}`}
-                        onClick={() => goToSlide(0)}
-                        style={{ flex: 1 }}
-                    >
-                        Введение
-                    </button>
+            <div className="navigation" style={{ position: 'relative' }}>
+                <button
+                    onClick={() => setIsBurgerOpen(!isBurgerOpen)}
+                    style={{
+                        background: '#2196f3',
+                        border: 'none',
+                        color: 'white',
+                        fontSize: '24px',
+                        padding: '10px 20px',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        transition: 'all 0.3s ease',
+                        boxShadow: isBurgerOpen ? '0 4px 12px rgba(33, 150, 243, 0.4)' : '0 2px 8px rgba(0,0,0,0.1)'
+                    }}
+                >
+                    <span style={{ fontSize: '20px' }}>☰</span>
+                    <span style={{ fontSize: '16px' }}>{slides[currentSlide].title}</span>
+                    <span style={{ fontSize: '14px', opacity: 0.8 }}>({currentSlide + 1}/{slides.length})</span>
+                </button>
 
-                    {/* Выпадающее меню для базовых хуков */}
-                    <div style={{ flex: 1, position: 'relative' }}>
-                        <button
-                            className={`nav-btn ${[1, 2, 3, 4].includes(currentSlide) ? 'active' : ''}`}
-                            onClick={() => setOpenMenu(openMenu === 'basic' ? null : 'basic')}
+                {/* Боковое меню */}
+                {isBurgerOpen && (
+                    <>
+                        {/* Оверлей для закрытия меню при клике вне его */}
+                        <div
+                            onClick={() => setIsBurgerOpen(false)}
                             style={{
-                                width: '100%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '5px'
-                            }}
-                        >
-                            🎯 Базовые хуки
-                            <span style={{ fontSize: '12px' }}>{openMenu === 'basic' ? '▲' : '▼'}</span>
-                        </button>
-
-                        {openMenu === 'basic' && (
-                            <div style={{
-                                position: 'absolute',
-                                top: '100%',
+                                position: 'fixed',
+                                top: 0,
                                 left: 0,
                                 right: 0,
-                                marginTop: '5px',
+                                bottom: 0,
+                                background: 'rgba(0, 0, 0, 0.5)',
+                                zIndex: 999
+                            }}
+                        />
+
+                        {/* Само меню */}
+                        <div
+                            style={{
+                                position: 'fixed',
+                                top: 0,
+                                left: 0,
+                                width: '350px',
+                                height: '100%',
                                 background: 'white',
-                                border: '2px solid #2196f3',
-                                borderRadius: '8px',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                                boxShadow: '2px 0 20px rgba(0,0,0,0.2)',
                                 zIndex: 1000,
-                                overflow: 'hidden'
+                                overflowY: 'auto',
+                                animation: 'slideIn 0.3s ease'
+                            }}
+                        >
+                            {/* Заголовок меню */}
+                            <div style={{
+                                padding: '20px',
+                                background: 'linear-gradient(135deg, #2196f3 0%, #1976d2 100%)',
+                                color: 'white',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                position: 'sticky',
+                                top: 0,
+                                zIndex: 1
                             }}>
+                                <h3 style={{ margin: 0, fontSize: '18px' }}>Навигация</h3>
+                                <button
+                                    onClick={() => setIsBurgerOpen(false)}
+                                    style={{
+                                        background: 'transparent',
+                                        border: 'none',
+                                        color: 'white',
+                                        fontSize: '24px',
+                                        cursor: 'pointer',
+                                        padding: '0',
+                                        width: '30px',
+                                        height: '30px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                    }}
+                                >
+                                    ✕
+                                </button>
+                            </div>
+
+                            {/* Пункты меню */}
+                            <div style={{ padding: '10px' }}>
+                                {/* Введение */}
+                                <button
+                                    className="nav-btn"
+                                    onClick={() => {
+                                        goToSlide(0);
+                                        setIsBurgerOpen(false);
+                                    }}
+                                    style={{
+                                        width: '100%',
+                                        textAlign: 'left',
+                                        background: currentSlide === 0 ? '#e3f2fd' : 'white',
+                                        marginBottom: '5px',
+                                        border: '1px solid #e0e0e0',
+                                        fontSize: '15px',
+                                        fontWeight: currentSlide === 0 ? 'bold' : 'normal'
+                                    }}
+                                >
+                                    📖 Введение
+                                </button>
+
+                                {/* React Теория */}
                                 <button
                                     className="nav-btn"
                                     onClick={() => {
                                         goToSlide(1);
-                                        setOpenMenu(null);
+                                        setIsBurgerOpen(false);
                                     }}
-                                    onMouseEnter={(e) => e.currentTarget.style.background = '#e3f2fd'}
-                                    onMouseLeave={(e) => e.currentTarget.style.background = currentSlide === 1 ? '#e3f2fd' : 'white'}
                                     style={{
                                         width: '100%',
                                         textAlign: 'left',
-                                        borderRadius: 0,
-                                        border: 'none',
-                                        borderBottom: '1px solid #e9ecef',
-                                        background: currentSlide === 1 ? '#e3f2fd' : 'white',
-                                        transition: 'background 0.2s ease'
+                                        background: currentSlide === 1 ? '#ede7f6' : 'white',
+                                        marginBottom: '5px',
+                                        border: '1px solid #e0e0e0',
+                                        fontSize: '15px',
+                                        fontWeight: currentSlide === 1 ? 'bold' : 'normal'
                                     }}
                                 >
-                                    📋 Обзор базовых хуков
+                                    ⚛️ React - Теория
                                 </button>
-                                {[
-                                    { index: 2, title: 'useState' },
-                                    { index: 3, title: 'useEffect' },
-                                    { index: 4, title: 'useContext' }
-                                ].map((hook, idx) => (
+
+                                {/* Базовые хуки */}
+                                <div style={{ marginTop: '15px', marginBottom: '10px' }}>
+                                    <div style={{
+                                        fontSize: '14px',
+                                        fontWeight: 'bold',
+                                        color: '#2196f3',
+                                        padding: '10px',
+                                        background: '#e3f2fd',
+                                        borderRadius: '6px',
+                                        marginBottom: '5px'
+                                    }}>
+                                        🎯 Базовые хуки
+                                    </div>
                                     <button
-                                        key={hook.index}
                                         className="nav-btn"
                                         onClick={() => {
-                                            goToSlide(hook.index);
-                                            setOpenMenu(null);
+                                            goToSlide(2);
+                                            setIsBurgerOpen(false);
                                         }}
-                                        onMouseEnter={(e) => e.currentTarget.style.background = '#e3f2fd'}
-                                        onMouseLeave={(e) => e.currentTarget.style.background = currentSlide === hook.index ? '#e3f2fd' : 'white'}
                                         style={{
                                             width: '100%',
                                             textAlign: 'left',
-                                            borderRadius: 0,
-                                            border: 'none',
-                                            borderBottom: idx < 2 ? '1px solid #e9ecef' : 'none',
-                                            background: currentSlide === hook.index ? '#e3f2fd' : 'white',
-                                            transition: 'background 0.2s ease'
+                                            background: currentSlide === 2 ? '#e3f2fd' : 'white',
+                                            marginBottom: '3px',
+                                            border: '1px solid #e0e0e0',
+                                            fontSize: '14px',
+                                            paddingLeft: '20px',
+                                            fontWeight: currentSlide === 2 ? 'bold' : 'normal'
                                         }}
                                     >
-                                        {hook.title}
+                                        📋 Обзор
                                     </button>
-                                ))}
-                            </div>
-                        )}
-                    </div>
+                                    {[
+                                        { index: 3, title: 'useState' },
+                                        { index: 4, title: 'useEffect' },
+                                        { index: 5, title: 'useContext' }
+                                    ].map((hook) => (
+                                        <button
+                                            key={hook.index}
+                                            className="nav-btn"
+                                            onClick={() => {
+                                                goToSlide(hook.index);
+                                                setIsBurgerOpen(false);
+                                            }}
+                                            style={{
+                                                width: '100%',
+                                                textAlign: 'left',
+                                                background: currentSlide === hook.index ? '#e3f2fd' : 'white',
+                                                marginBottom: '3px',
+                                                border: '1px solid #e0e0e0',
+                                                fontSize: '14px',
+                                                paddingLeft: '20px',
+                                                fontWeight: currentSlide === hook.index ? 'bold' : 'normal'
+                                            }}
+                                        >
+                                            {hook.title}
+                                        </button>
+                                    ))}
+                                </div>
 
-                    {/* Выпадающее меню для дополнительных хуков */}
-                    <div style={{ flex: 1, position: 'relative' }}>
-                        <button
-                            className={`nav-btn ${[5, 6, 7, 8].includes(currentSlide) ? 'active' : ''}`}
-                            onClick={() => setOpenMenu(openMenu === 'additional' ? null : 'additional')}
-                            style={{
-                                width: '100%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '5px'
-                            }}
-                        >
-                            ⚡ Дополнительные хуки
-                            <span style={{ fontSize: '12px' }}>{openMenu === 'additional' ? '▲' : '▼'}</span>
-                        </button>
+                                {/* Дополнительные хуки */}
+                                <div style={{ marginTop: '15px', marginBottom: '10px' }}>
+                                    <div style={{
+                                        fontSize: '14px',
+                                        fontWeight: 'bold',
+                                        color: '#ff6b6b',
+                                        padding: '10px',
+                                        background: '#ffe3e3',
+                                        borderRadius: '6px',
+                                        marginBottom: '5px'
+                                    }}>
+                                        ⚡ Дополнительные хуки
+                                    </div>
+                                    <button
+                                        className="nav-btn"
+                                        onClick={() => {
+                                            goToSlide(6);
+                                            setIsBurgerOpen(false);
+                                        }}
+                                        style={{
+                                            width: '100%',
+                                            textAlign: 'left',
+                                            background: currentSlide === 6 ? '#ffe3e3' : 'white',
+                                            marginBottom: '3px',
+                                            border: '1px solid #e0e0e0',
+                                            fontSize: '14px',
+                                            paddingLeft: '20px',
+                                            fontWeight: currentSlide === 6 ? 'bold' : 'normal'
+                                        }}
+                                    >
+                                        📋 Обзор
+                                    </button>
+                                    {[
+                                        { index: 7, title: 'useReducer' },
+                                        { index: 8, title: 'useMemo/useCallback' },
+                                        { index: 9, title: 'useRef' }
+                                    ].map((hook) => (
+                                        <button
+                                            key={hook.index}
+                                            className="nav-btn"
+                                            onClick={() => {
+                                                goToSlide(hook.index);
+                                                setIsBurgerOpen(false);
+                                            }}
+                                            style={{
+                                                width: '100%',
+                                                textAlign: 'left',
+                                                background: currentSlide === hook.index ? '#ffe3e3' : 'white',
+                                                marginBottom: '3px',
+                                                border: '1px solid #e0e0e0',
+                                                fontSize: '14px',
+                                                paddingLeft: '20px',
+                                                fontWeight: currentSlide === hook.index ? 'bold' : 'normal'
+                                            }}
+                                        >
+                                            {hook.title}
+                                        </button>
+                                    ))}
+                                </div>
 
-                        {openMenu === 'additional' && (
-                            <div style={{
-                                position: 'absolute',
-                                top: '100%',
-                                left: 0,
-                                right: 0,
-                                marginTop: '5px',
-                                background: 'white',
-                                border: '2px solid #ff6b6b',
-                                borderRadius: '8px',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                                zIndex: 1000,
-                                overflow: 'hidden'
-                            }}>
+                                {/* React 18+ хуки */}
+                                <div style={{ marginTop: '15px', marginBottom: '10px' }}>
+                                    <div style={{
+                                        fontSize: '14px',
+                                        fontWeight: 'bold',
+                                        color: '#10b981',
+                                        padding: '10px',
+                                        background: '#d1fae5',
+                                        borderRadius: '6px',
+                                        marginBottom: '5px'
+                                    }}>
+                                        🚀 React 18+ хуки
+                                    </div>
+                                    <button
+                                        className="nav-btn"
+                                        onClick={() => {
+                                            goToSlide(10);
+                                            setIsBurgerOpen(false);
+                                        }}
+                                        style={{
+                                            width: '100%',
+                                            textAlign: 'left',
+                                            background: currentSlide === 10 ? '#d1fae5' : 'white',
+                                            marginBottom: '3px',
+                                            border: '1px solid #e0e0e0',
+                                            fontSize: '14px',
+                                            paddingLeft: '20px',
+                                            fontWeight: currentSlide === 10 ? 'bold' : 'normal'
+                                        }}
+                                    >
+                                        📋 Обзор
+                                    </button>
+                                    {[
+                                        { index: 11, title: 'useDeferredValue' },
+                                        { index: 12, title: 'useTransition' },
+                                        { index: 13, title: 'useId' },
+                                        { index: 14, title: 'useSyncExternalStore' },
+                                        { index: 15, title: 'useInsertionEffect' }
+                                    ].map((hook) => (
+                                        <button
+                                            key={hook.index}
+                                            className="nav-btn"
+                                            onClick={() => {
+                                                goToSlide(hook.index);
+                                                setIsBurgerOpen(false);
+                                            }}
+                                            style={{
+                                                width: '100%',
+                                                textAlign: 'left',
+                                                background: currentSlide === hook.index ? '#d1fae5' : 'white',
+                                                marginBottom: '3px',
+                                                border: '1px solid #e0e0e0',
+                                                fontSize: '14px',
+                                                paddingLeft: '20px',
+                                                fontWeight: currentSlide === hook.index ? 'bold' : 'normal'
+                                            }}
+                                        >
+                                            {hook.title}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                {/* React 19+ хуки */}
+                                <div style={{ marginTop: '15px', marginBottom: '10px' }}>
+                                    <div style={{
+                                        fontSize: '14px',
+                                        fontWeight: 'bold',
+                                        color: '#a855f7',
+                                        padding: '10px',
+                                        background: '#f3e8ff',
+                                        borderRadius: '6px',
+                                        marginBottom: '5px'
+                                    }}>
+                                        💎 React 19+ хуки
+                                    </div>
+                                    <button
+                                        className="nav-btn"
+                                        onClick={() => {
+                                            goToSlide(16);
+                                            setIsBurgerOpen(false);
+                                        }}
+                                        style={{
+                                            width: '100%',
+                                            textAlign: 'left',
+                                            background: currentSlide === 16 ? '#f3e8ff' : 'white',
+                                            marginBottom: '3px',
+                                            border: '1px solid #e0e0e0',
+                                            fontSize: '14px',
+                                            paddingLeft: '20px',
+                                            fontWeight: currentSlide === 16 ? 'bold' : 'normal'
+                                        }}
+                                    >
+                                        📋 Обзор
+                                    </button>
+                                    {[
+                                        { index: 17, title: 'use' },
+                                        { index: 18, title: 'useOptimistic' },
+                                        { index: 19, title: 'useActionState' },
+                                        { index: 20, title: 'useFormStatus' }
+                                    ].map((hook) => (
+                                        <button
+                                            key={hook.index}
+                                            className="nav-btn"
+                                            onClick={() => {
+                                                goToSlide(hook.index);
+                                                setIsBurgerOpen(false);
+                                            }}
+                                            style={{
+                                                width: '100%',
+                                                textAlign: 'left',
+                                                background: currentSlide === hook.index ? '#f3e8ff' : 'white',
+                                                marginBottom: '3px',
+                                                border: '1px solid #e0e0e0',
+                                                fontSize: '14px',
+                                                paddingLeft: '20px',
+                                                fontWeight: currentSlide === hook.index ? 'bold' : 'normal'
+                                            }}
+                                        >
+                                            {hook.title}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                {/* Заключение */}
                                 <button
                                     className="nav-btn"
                                     onClick={() => {
-                                        goToSlide(5);
-                                        setOpenMenu(null);
+                                        goToSlide(21);
+                                        setIsBurgerOpen(false);
                                     }}
-                                    onMouseEnter={(e) => e.currentTarget.style.background = '#ffe3e3'}
-                                    onMouseLeave={(e) => e.currentTarget.style.background = currentSlide === 5 ? '#ffe3e3' : 'white'}
                                     style={{
                                         width: '100%',
                                         textAlign: 'left',
-                                        borderRadius: 0,
-                                        border: 'none',
-                                        borderBottom: '1px solid #e9ecef',
-                                        background: currentSlide === 5 ? '#ffe3e3' : 'white',
-                                        transition: 'background 0.2s ease'
+                                        background: currentSlide === 21 ? '#e3f2fd' : 'white',
+                                        marginTop: '10px',
+                                        border: '1px solid #e0e0e0',
+                                        fontSize: '15px',
+                                        fontWeight: currentSlide === 21 ? 'bold' : 'normal'
                                     }}
                                 >
-                                    📋 Обзор дополнительных хуков
+                                    🎓 Заключение
                                 </button>
-                                {[
-                                    { index: 6, title: 'useReducer' },
-                                    { index: 7, title: 'useMemo/useCallback' },
-                                    { index: 8, title: 'useRef' }
-                                ].map((hook, idx) => (
-                                    <button
-                                        key={hook.index}
-                                        className="nav-btn"
-                                        onClick={() => {
-                                            goToSlide(hook.index);
-                                            setOpenMenu(null);
-                                        }}
-                                        onMouseEnter={(e) => e.currentTarget.style.background = '#ffe3e3'}
-                                        onMouseLeave={(e) => e.currentTarget.style.background = currentSlide === hook.index ? '#ffe3e3' : 'white'}
-                                        style={{
-                                            width: '100%',
-                                            textAlign: 'left',
-                                            borderRadius: 0,
-                                            border: 'none',
-                                            borderBottom: idx < 2 ? '1px solid #e9ecef' : 'none',
-                                            background: currentSlide === hook.index ? '#ffe3e3' : 'white',
-                                            transition: 'background 0.2s ease'
-                                        }}
-                                    >
-                                        {hook.title}
-                                    </button>
-                                ))}
                             </div>
-                        )}
-                    </div>
+                        </div>
 
-                    {/* Выпадающее меню для React 18+ хуков */}
-                    <div style={{ flex: 1, position: 'relative' }}>
-                        <button
-                            className={`nav-btn ${[9, 10, 11, 12, 13, 14].includes(currentSlide) ? 'active' : ''}`}
-                            onClick={() => setOpenMenu(openMenu === 'react18plus' ? null : 'react18plus')}
-                            style={{
-                                width: '100%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '5px'
-                            }}
-                        >
-                            🚀 React 18+ хуки
-                            <span style={{ fontSize: '12px' }}>{openMenu === 'react18plus' ? '▲' : '▼'}</span>
-                        </button>
-
-                        {openMenu === 'react18plus' && (
-                            <div style={{
-                                position: 'absolute',
-                                top: '100%',
-                                left: 0,
-                                right: 0,
-                                marginTop: '5px',
-                                background: 'white',
-                                border: '2px solid #10b981',
-                                borderRadius: '8px',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                                zIndex: 1000,
-                                overflow: 'hidden'
-                            }}>
-                                <button
-                                    className="nav-btn"
-                                    onClick={() => {
-                                        goToSlide(9);
-                                        setOpenMenu(null);
-                                    }}
-                                    onMouseEnter={(e) => e.currentTarget.style.background = '#d1fae5'}
-                                    onMouseLeave={(e) => e.currentTarget.style.background = currentSlide === 9 ? '#d1fae5' : 'white'}
-                                    style={{
-                                        width: '100%',
-                                        textAlign: 'left',
-                                        borderRadius: 0,
-                                        border: 'none',
-                                        borderBottom: '1px solid #e9ecef',
-                                        background: currentSlide === 9 ? '#d1fae5' : 'white',
-                                        transition: 'background 0.2s ease'
-                                    }}
-                                >
-                                    📋 Обзор React 18+ хуков
-                                </button>
-                                {[
-                                    { index: 10, title: 'useDeferredValue' },
-                                    { index: 11, title: 'useTransition' },
-                                    { index: 12, title: 'useId' },
-                                    { index: 13, title: 'useSyncExternalStore' },
-                                    { index: 14, title: 'useInsertionEffect' }
-                                ].map((hook, idx) => (
-                                    <button
-                                        key={hook.index}
-                                        className="nav-btn"
-                                        onClick={() => {
-                                            goToSlide(hook.index);
-                                            setOpenMenu(null);
-                                        }}
-                                        onMouseEnter={(e) => e.currentTarget.style.background = '#d1fae5'}
-                                        onMouseLeave={(e) => e.currentTarget.style.background = currentSlide === hook.index ? '#d1fae5' : 'white'}
-                                        style={{
-                                            width: '100%',
-                                            textAlign: 'left',
-                                            borderRadius: 0,
-                                            border: 'none',
-                                            borderBottom: idx < 4 ? '1px solid #e9ecef' : 'none',
-                                            background: currentSlide === hook.index ? '#d1fae5' : 'white',
-                                            transition: 'background 0.2s ease'
-                                        }}
-                                    >
-                                        {hook.title}
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Выпадающее меню для React 19+ хуков */}
-                    <div style={{ flex: 1, position: 'relative' }}>
-                        <button
-                            className={`nav-btn ${[15, 16, 17, 18, 19].includes(currentSlide) ? 'active' : ''}`}
-                            onClick={() => setOpenMenu(openMenu === 'react19plus' ? null : 'react19plus')}
-                            style={{
-                                width: '100%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '5px'
-                            }}
-                        >
-                            💎 React 19+ хуки
-                            <span style={{ fontSize: '12px' }}>{openMenu === 'react19plus' ? '▲' : '▼'}</span>
-                        </button>
-
-                        {openMenu === 'react19plus' && (
-                            <div style={{
-                                position: 'absolute',
-                                top: '100%',
-                                left: 0,
-                                right: 0,
-                                marginTop: '5px',
-                                background: 'white',
-                                border: '2px solid #a855f7',
-                                borderRadius: '8px',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                                zIndex: 1000,
-                                overflow: 'hidden'
-                            }}>
-                                <button
-                                    className="nav-btn"
-                                    onClick={() => {
-                                        goToSlide(15);
-                                        setOpenMenu(null);
-                                    }}
-                                    onMouseEnter={(e) => e.currentTarget.style.background = '#f3e8ff'}
-                                    onMouseLeave={(e) => e.currentTarget.style.background = currentSlide === 15 ? '#f3e8ff' : 'white'}
-                                    style={{
-                                        width: '100%',
-                                        textAlign: 'left',
-                                        borderRadius: 0,
-                                        border: 'none',
-                                        borderBottom: '1px solid #e9ecef',
-                                        background: currentSlide === 15 ? '#f3e8ff' : 'white',
-                                        transition: 'background 0.2s ease'
-                                    }}
-                                >
-                                    📋 Обзор React 19+ хуков
-                                </button>
-                                {[
-                                    { index: 16, title: 'use' },
-                                    { index: 17, title: 'useOptimistic' },
-                                    { index: 18, title: 'useActionState' },
-                                    { index: 19, title: 'useFormStatus' }
-                                ].map((hook, idx) => (
-                                    <button
-                                        key={hook.index}
-                                        className="nav-btn"
-                                        onClick={() => {
-                                            goToSlide(hook.index);
-                                            setOpenMenu(null);
-                                        }}
-                                        onMouseEnter={(e) => e.currentTarget.style.background = '#f3e8ff'}
-                                        onMouseLeave={(e) => e.currentTarget.style.background = currentSlide === hook.index ? '#f3e8ff' : 'white'}
-                                        style={{
-                                            width: '100%',
-                                            textAlign: 'left',
-                                            borderRadius: 0,
-                                            border: 'none',
-                                            borderBottom: idx < 3 ? '1px solid #e9ecef' : 'none',
-                                            background: currentSlide === hook.index ? '#f3e8ff' : 'white',
-                                            transition: 'background 0.2s ease'
-                                        }}
-                                    >
-                                        {hook.title}
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-
-                    <button
-                        className={`nav-btn ${currentSlide === 20 ? 'active' : ''}`}
-                        onClick={() => goToSlide(20)}
-                        style={{ flex: 1 }}
-                    >
-                        Заключение
-                    </button>
-                </div>
+                        <style>
+{`@keyframes slideIn {
+    from {
+        transform: translateX(-100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}`}
+                        </style>
+                    </>
+                )}
             </div>
 
             <div className="content">

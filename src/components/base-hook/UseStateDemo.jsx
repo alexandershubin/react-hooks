@@ -79,6 +79,7 @@ function UseStateDemo() {
     const inputValue = optimizedInputRef.current.value;
     logStateChange('optimizedName', optimizedName, inputValue);
     setOptimizedName(inputValue);
+    console.log(inputValue, 'inputValue');
   };
 
   const clearOptimizedInput = () => {
