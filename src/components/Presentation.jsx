@@ -818,7 +818,6 @@ function SummarySlide() {
 function Presentation() {
     const [currentSlide, setCurrentSlide] = useState(0);
     const [isFullscreen, setIsFullscreen] = useState(false);
-    const [openMenu, setOpenMenu] = useState(null); // 'basic', 'additional', 'react18plus', or 'react19plus'
     const [isBurgerOpen, setIsBurgerOpen] = useState(false);
 
     const slides = [

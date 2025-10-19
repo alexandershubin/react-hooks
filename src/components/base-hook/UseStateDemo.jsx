@@ -1,4 +1,4 @@
-import {useState, useRef, useEffect} from 'react'
+import {useState, useRef} from 'react'
 
 function UseStateDemo() {
   const [count, setCount] = useState(0);
@@ -317,7 +317,7 @@ const [name, setName] = useState('');
 
 // useRef инпут - меньше рендеров
 const inputRef = useRef(null);
-const [savedValue, setSavedValue] = useState('');
+const [_, setSavedValue] = useState('');
 
 const handleSubmit = () => {
     setSavedValue(inputRef.current.value); // Рендер только при отправке
