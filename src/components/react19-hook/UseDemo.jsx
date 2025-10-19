@@ -1,4 +1,4 @@
-import { use, Suspense, useState } from 'react'
+import { use, Suspense, useState, createContext } from 'react'
 
 // Функция для создания промиса с задержкой
 function fetchData(delay = 1000) {
@@ -33,8 +33,8 @@ function DataDisplay({ dataPromise }) {
   )
 }
 
-// Компонент с Context
-const ThemeContext = { _currentValue: 'dark' }
+// Создаём React Context
+const ThemeContext = createContext('dark')
 
 function ThemedComponent() {
   const theme = use(ThemeContext)

@@ -3,16 +3,27 @@ import { useSyncExternalStore, useState, useEffect } from 'react'
 // Внешнее хранилище 1: Размер окна
 const windowSizeStore = {
   listeners: new Set(),
+  currentSnapshot: { width: window.innerWidth, height: window.innerHeight },
 
   getSnapshot() {
-    return {
-      width: window.innerWidth,
-      height: window.innerHeight
+    return this.currentSnapshot
+  },
+
+  updateSnapshot() {
+    const newWidth = window.innerWidth
+    const newHeight = window.innerHeight
+
+    // Обновляем только если изменилось
+    if (this.currentSnapshot.width !== newWidth || this.currentSnapshot.height !== newHeight) {
+      this.currentSnapshot = { width: newWidth, height: newHeight }
     }
   },
 
   subscribe(listener) {
-    const handleResize = () => listener()
+    const handleResize = () => {
+      this.updateSnapshot()
+      listener()
+    }
     window.addEventListener('resize', handleResize)
     this.listeners.add(handleResize)
 
