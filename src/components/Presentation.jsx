@@ -15,6 +15,7 @@ import UseDemo from './react19-hook/UseDemo.jsx'
 import UseOptimisticDemo from './react19-hook/UseOptimisticDemo.jsx'
 import UseActionStateDemo from './react19-hook/UseActionStateDemo.jsx'
 import UseFormStatusDemo from './react19-hook/UseFormStatusDemo.jsx'
+import Playground from './Playground.jsx'
 
 // Слайд введения
 function IntroSlide() {
