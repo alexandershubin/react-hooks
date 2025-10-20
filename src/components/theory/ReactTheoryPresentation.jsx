@@ -4,6 +4,20 @@ import Slide2HowItWorks from './slides/Slide2HowItWorks.jsx'
 import Slide3Lifecycle from './slides/Slide3Lifecycle.jsx'
 import Slide4AllHooks from './slides/Slide4AllHooks.jsx'
 import Slide5BasicHooksTheory from './slides/Slide5BasicHooksTheory.jsx'
+import Slide6React18Features from './slides/Slide6React18Features.jsx'
+import Slide7React19Features from './slides/Slide7React19Features.jsx'
+import Slide8ConcurrentDeep from './slides/Slide8ConcurrentDeep.jsx'
+import Slide9ServerComponentsDeep from './slides/Slide9ServerComponentsDeep.jsx'
+import Slide10AsyncInUseEffect from './slides/Slide10AsyncInUseEffect.jsx'
+import Slide11TransitionVsDeferred from './slides/Slide11TransitionVsDeferred.jsx'
+import Slide12UseId from './slides/Slide12UseId.jsx'
+import Slide13UseSyncExternalStore from './slides/Slide13UseSyncExternalStore.jsx'
+import Slide14UseInsertionEffect from './slides/Slide14UseInsertionEffect.jsx'
+import Slide15ReactCompiler from './slides/Slide15ReactCompiler.jsx'
+import Slide16UseHook from './slides/Slide16UseHook.jsx'
+import Slide17UseOptimistic from './slides/Slide17UseOptimistic.jsx'
+import Slide18UseActionState from './slides/Slide18UseActionState.jsx'
+import Slide19UseFormStatus from './slides/Slide19UseFormStatus.jsx'
 
 // Главный компонент презентации
 function ReactTheoryPresentation({ goToSlide }) {
@@ -14,7 +28,21 @@ function ReactTheoryPresentation({ goToSlide }) {
     { component: <Slide2HowItWorks />, title: 'Как работает React?' },
     { component: <Slide3Lifecycle />, title: 'Жизненный цикл компонентов' },
     { component: <Slide4AllHooks goToMainSlide={goToSlide} />, title: 'Все хуки React' },
-    { component: <Slide5BasicHooksTheory />, title: 'Теория базовых хуков' }
+    { component: <Slide5BasicHooksTheory />, title: 'Теория базовых хуков' },
+    { component: <Slide10AsyncInUseEffect />, title: 'Почему нельзя async в useEffect' },
+    { component: <Slide6React18Features />, title: 'Что нового в React 18' },
+    { component: <Slide8ConcurrentDeep />, title: 'Как работает Concurrent Rendering' },
+    { component: <Slide11TransitionVsDeferred />, title: 'useTransition vs useDeferredValue' },
+    { component: <Slide12UseId />, title: 'useId - генерация уникальных ID' },
+    { component: <Slide13UseSyncExternalStore />, title: 'useSyncExternalStore - внешние источники' },
+    { component: <Slide14UseInsertionEffect />, title: 'useInsertionEffect - CSS-in-JS' },
+    { component: <Slide9ServerComponentsDeep />, title: 'Как работают Server Components' },
+    { component: <Slide7React19Features />, title: 'Что нового в React 19' },
+    { component: <Slide15ReactCompiler />, title: 'React Compiler - автоматическая оптимизация' },
+    { component: <Slide16UseHook />, title: 'use() - универсальный хук' },
+    { component: <Slide17UseOptimistic />, title: 'useOptimistic - оптимистичные обновления' },
+    { component: <Slide18UseActionState />, title: 'useActionState - состояние действий' },
+    { component: <Slide19UseFormStatus />, title: 'useFormStatus - статус формы' }
   ]
 
   const nextSlide = () => {
